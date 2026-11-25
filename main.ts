@@ -1,7 +1,9 @@
-// Last Out of Office: The AI That Went Barista
-// Reads entry.txt and writes the entry text to the output directory
-// named by MAKEFUN_BOT_DIR or MAKEFUN_OUTPUT_DIR.
-// Node 22+, stdlib only. No network, no wall clock.
+// The output directory is chosen from the environment so the harness can
+// point the bot at a fresh folder per run. MAKEFUN_BOT_DIR wins when both
+// are set; MAKEFUN_OUTPUT_DIR is the fallback name the runner also accepts.
+// Neither is ever written to entry.txt's own directory: the program only
+// reads its bundled entry.txt and writes a single copy into the chosen
+// output directory, so the source text stays untouched.
 
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -14,7 +16,9 @@ if (entry.length === 0) {
 }
 
 const outDir =
-  process.env.MAKEFUN_BOT_DIR ?? process.env.MAKEFUN_OUTPUT_DIR ?? null;
+  process.env.MAKEFUN_BOT_DIR?.trim() ||
+  process.env.MAKEFUN_OUTPUT_DIR?.trim() ||
+  null;
 if (!outDir) {
   throw new Error(
     "Set MAKEFUN_BOT_DIR or MAKEFUN_OUTPUT_DIR to the output directory.",
